@@ -10,14 +10,13 @@ on:
     branches: '*'
 
 jobs:
-  quality:
+  build:
 
-    runs-on: ${{ matix.os }}
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
         node-version: [14.x, 16.x, 18.x]
-        os: [ubuntu-latest,windowns-latest]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
