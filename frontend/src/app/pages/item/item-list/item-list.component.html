@@ -1,0 +1,48 @@
+<div class="list row">
+    <div class="col-md-6">
+        <h4>Lista de Itens</h4>
+        <ul class="list-group">
+        <li
+            class="list-group-item"
+            *ngFor="let item of ItemCollection; let i = index"
+            [class.active]="i == currentIndex"
+            (click)="setActiveItem(item, i)"
+        >
+            {{ item.codigo }} {{ item.descricaoItem }} {{ item.pontos }} {{ item.fotoItem }} {{ item.obsoleto }} 
+        </li>
+        </ul>
+
+        <button class="m-3 btn btn-sm btn-danger" (click)="removeAllItens()">
+        Remover Tudo
+        </button>
+    </div>
+    <div class="col-md-6">
+        <div *ngIf="currentItem.id">
+        <h4>Item</h4>
+        <div>
+            <label><strong>Código:</strong></label> {{ currentItem.codigo }}
+        </div>
+        <div>
+            <label><strong>DescricaoItem:</strong></label> {{ currentItem.descricaoItem }}
+        </div>
+        <div>
+            <label><strong>Pontos:</strong></label> {{ currentItem.pontos }}
+        </div>
+        <div>
+            <label><strong>FotoItem:</strong></label> {{ currentItem.fotoItem }}
+        </div>
+        <div>
+            <label><strong>Obsoleto:</strong></label> {{ currentItem.obsoleto }}
+        </div>
+
+        <a class="badge badge-warning" routerLink="{{ currentItem.id }}/edit">
+            Editar
+        </a>
+        </div>
+
+        <div *ngIf="!currentItem">
+        <br />
+        <p>Por favor selecione uma linha da lista de Item...</p>
+        </div>
+    </div>
+</div>

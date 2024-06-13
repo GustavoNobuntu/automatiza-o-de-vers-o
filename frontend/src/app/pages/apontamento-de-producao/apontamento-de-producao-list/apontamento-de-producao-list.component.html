@@ -1,0 +1,51 @@
+<div class="list row">
+    <div class="col-md-6">
+        <h4>Lista de ApontamentosDeProducao</h4>
+        <ul class="list-group">
+        <li
+            class="list-group-item"
+            *ngFor="let apontamentoDeProducao of ApontamentoDeProducaoCollection; let i = index"
+            [class.active]="i == currentIndex"
+            (click)="setActiveApontamentoDeProducao(apontamentoDeProducao, i)"
+        >
+            {{ apontamentoDeProducao.codigo }} {{ apontamentoDeProducao.itemDeOP }} {{ apontamentoDeProducao.funcionario }} {{ apontamentoDeProducao.dataProducao | date:'shortTime' }} {{ apontamentoDeProducao.quantidade }} 
+        </li>
+        </ul>
+
+        <button class="m-3 btn btn-sm btn-danger" (click)="removeAllApontamentosDeProducao()">
+        Remover Tudo
+        </button>
+    </div>
+    <div class="col-md-6">
+        <div *ngIf="currentApontamentoDeProducao.id">
+        <h4>ApontamentoDeProducao</h4>
+        <div>
+            <label><strong>Código:</strong></label> {{ currentApontamentoDeProducao.codigo }}
+        </div>
+        <div>
+            <label><strong>ItemDeOP:</strong></label> {{ currentApontamentoDeProducao.itemDeOP }}
+        </div>
+        <div>
+            <label><strong>Funcionario:</strong></label> {{ currentApontamentoDeProducao.funcionario }}
+        </div>
+        <div>
+            <label><strong>DataProducao:</strong></label> {{ currentApontamentoDeProducao.dataProducao | date:'dd/mm/yyyy' }}
+        </div>
+        <div>
+            <label><strong>Quantidade:</strong></label> {{ currentApontamentoDeProducao.quantidade }}
+        </div>
+        <div>
+            <label><strong>Cancelada:</strong></label> {{ currentApontamentoDeProducao.cancelada }}
+        </div>
+
+        <a class="badge badge-warning" routerLink="{{ currentApontamentoDeProducao.id }}/edit">
+            Editar
+        </a>
+        </div>
+
+        <div *ngIf="!currentApontamentoDeProducao">
+        <br />
+        <p>Por favor selecione uma linha da lista de ApontamentoDeProducao...</p>
+        </div>
+    </div>
+</div>

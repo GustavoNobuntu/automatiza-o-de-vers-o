@@ -1,0 +1,55 @@
+  <div>
+    <div class="edit-form">
+      <h1 class="ml-5"><strong>{{funcionario.nome}}</strong></h1> 
+
+      
+        <mat-form-field appearance="fill">
+          <mat-label>Codigo</mat-label>
+          <input matInput type="number" [(ngModel)]="apontamentoDeProducao.codigo">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" *ngIf="error"> 
+          <mat-label>Ordem de Produção</mat-label>
+          <input matInput [(ngModel)]="idOP">
+          <mat-error >Não foi possivel encontrar a ordem de produção</mat-error>
+          <button mat-icon-button matSuffix (click)="getOrdemProducao(idOP)">
+            <mat-icon>search</mat-icon>
+        </button>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Quantidade</mat-label>
+          <input matInput type="number" [(ngModel)]="apontamentoDeProducao.quantidade">
+        </mat-form-field>
+
+      <mat-form-field appearance="fill" *ngIf="currentAction == 'edit'">
+        <mat-label>Cancelada</mat-label>
+        <select matNativeControl [(ngModel)]="apontamentoDeProducao.cancelada">
+          <option value="true">True</option>
+          <option value="false">False</option>
+        </select>
+      </mat-form-field>
+
+      <mat-card *ngIf="!error">
+        <mat-card-header style="display: flex;">
+          <img mat-card-avatar [src]="ordemProducao.fotoItem">
+          <mat-card-title>{{ordemProducao.descricaoItem}}</mat-card-title>
+          <mat-card-subtitle>Quantidade: <strong>{{ordemProducao.quantidade}}</strong></mat-card-subtitle>
+          <button mat-mini-fab color="warn" class="float-right" (click)="deleteOP()">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-card-header>
+      </mat-card>
+
+      <button
+        mat-raised-button color="primary"
+        [disabled]="error"
+        class="submit"
+        (click)="createApontamentoDeProducao()"
+      >
+        Gravar
+      </button>
+      <p>{{ message }}</p>
+    </div>
+
+  </div>

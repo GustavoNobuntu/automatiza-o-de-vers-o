@@ -1,0 +1,48 @@
+<div class="list row">
+    <div class="col-md-6">
+        <h4>Lista de RelatoriosDeProducao</h4>
+        <ul class="list-group">
+        <li
+            class="list-group-item"
+            *ngFor="let relatorioDeProducao of RelatorioDeProducaoCollection; let i = index"
+            [class.active]="i == currentIndex"
+            (click)="setActiveRelatorioDeProducao(relatorioDeProducao, i)"
+        >
+            {{ relatorioDeProducao.nomeFuncionario }} {{ relatorioDeProducao.codigoItem }} {{ relatorioDeProducao.descricaoItem }} {{ relatorioDeProducao.quantidade }} {{ relatorioDeProducao.pontos }} 
+        </li>
+        </ul>
+
+        <button class="m-3 btn btn-sm btn-danger" (click)="removeAllRelatoriosDeProducao()">
+        Remover Tudo
+        </button>
+    </div>
+    <div class="col-md-6">
+        <div *ngIf="currentRelatorioDeProducao.id">
+        <h4>RelatorioDeProducao</h4>
+        <div>
+            <label><strong>NomeFuncionario:</strong></label> {{ currentRelatorioDeProducao.nomeFuncionario }}
+        </div>
+        <div>
+            <label><strong>CodigoItem:</strong></label> {{ currentRelatorioDeProducao.codigoItem }}
+        </div>
+        <div>
+            <label><strong>DescricaoItem:</strong></label> {{ currentRelatorioDeProducao.descricaoItem }}
+        </div>
+        <div>
+            <label><strong>Quantidade:</strong></label> {{ currentRelatorioDeProducao.quantidade }}
+        </div>
+        <div>
+            <label><strong>Pontos:</strong></label> {{ currentRelatorioDeProducao.pontos }}
+        </div>
+
+        <a class="badge badge-warning" routerLink="{{ currentRelatorioDeProducao.id }}/edit">
+            Editar
+        </a>
+        </div>
+
+        <div *ngIf="!currentRelatorioDeProducao">
+        <br />
+        <p>Por favor selecione uma linha da lista de RelatorioDeProducao...</p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,89 @@
+  <div>
+    <div class="edit-form">
+      <h1><strong>{{pageTitle}}</strong></h1> 
+
+      
+      <mat-form-field appearance="fill">
+        <mat-label>Codigo</mat-label>
+        <input matInput type="number" [(ngModel)]="ordemDeProducao.codigo">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Item de Operario</mat-label>
+        <input matInput type="number" [(ngModel)]="ordemDeProducao.itemDeOP">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Pedido</mat-label>
+        <input matInput type="number" [(ngModel)]="ordemDeProducao.pedido">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Nome Cliente</mat-label>
+        <input matInput [(ngModel)]="ordemDeProducao.nomeCliente">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Data</mat-label>
+        <input matInput placeholder="DD/MM/YYYY" [matDatepicker]="picker" [(ngModel)]="ordemDeProducao.data">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>prazo</mat-label>
+        <input matInput placeholder="DD/MM/YYYY" [matDatepicker]="picker1" [(ngModel)]="ordemDeProducao.prazo">
+        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+        <mat-datepicker #picker1></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Codigo de Item</mat-label>
+        <input matInput type="number" [(ngModel)]="ordemDeProducao.codigoItem">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Descrição de item</mat-label>
+        <input matInput [(ngModel)]="ordemDeProducao.descricaoItem">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Quantidade</mat-label>
+        <input matInput type="number" [(ngModel)]="ordemDeProducao.quantidade">
+      </mat-form-field>
+
+      <div class="form-group">
+        <label for="fotoItem">Foto de Item</label>
+        <input
+          type="text"
+          class="form-control"
+          id="fotoItem"
+          required
+          [(ngModel)]="ordemDeProducao.fotoItem"
+          name="fotoItem"
+        />
+      </div>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Cancelada</mat-label>
+        <select matNativeControl [(ngModel)]="ordemDeProducao.cancelada">
+          <option value="true">True</option>
+          <option value="false">False</option>
+        </select>
+      </mat-form-field>
+
+      <button class="badge badge-danger mr-2" (click)="deleteOrdemDeProducao()" *ngIf="currentAction == 'edit'">
+        Excluir
+      </button>
+
+      <button
+        type="submit"
+        class="badge badge-success mb-2"
+        (click)="submitForm()"
+      >
+        Gravar
+      </button>
+      <p>{{ message }}</p>
+    </div>
+
+  </div>

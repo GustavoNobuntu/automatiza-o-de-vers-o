@@ -1,0 +1,45 @@
+  <div>
+    <div class="edit-form">
+      <h1><strong>{{pageTitle}}</strong></h1> 
+      
+        <div>
+        <mat-form-field appearance="fill">
+          <mat-label>Codigo</mat-label>
+          <input matInput type="number" [(ngModel)]="funcionario.codigo">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Nome</mat-label>
+          <input matInput [(ngModel)]="funcionario.nome">
+        </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Ativo</mat-label>
+        <select matNativeControl [(ngModel)]="funcionario.ativo">
+          <option value="true">True</option>
+          <option value="false">False</option>
+        </select>
+      </mat-form-field>
+
+      <div>
+        <form enctype="multipart/form-data">
+          <input type="file" #fileInput/>
+        </form>
+      </div>
+
+      <button class="badge badge-danger mr-2" (click)="deleteFuncionario()" *ngIf="currentAction == 'edit'">
+        Excluir
+      </button>
+
+      <button
+        type="submit"
+        class="badge badge-success mb-2 float-right"
+        (click)="submitForm()"
+      >
+        Gravar
+      </button>
+    </div>
+    </div>      
+
+  </div>
+ 

@@ -1,0 +1,66 @@
+<div class="list row">
+    <div class="col-md-6">
+        <h4>Lista de OrdensDeProducao</h4>
+        <ul class="list-group">
+        <li
+            class="list-group-item"
+            *ngFor="let ordemDeProducao of OrdemDeProducaoCollection; let i = index"
+            [class.active]="i == currentIndex"
+            (click)="setActiveOrdemDeProducao(ordemDeProducao, i)"
+        >
+            {{ ordemDeProducao.codigo }} {{ ordemDeProducao.itemDeOP }} {{ ordemDeProducao.pedido }} {{ ordemDeProducao.nomeCliente }} {{ ordemDeProducao.data }} {{ ordemDeProducao.prazo }} {{ ordemDeProducao.codigoItem }} {{ ordemDeProducao.descricaoItem }} {{ ordemDeProducao.quantidade }} {{ ordemDeProducao.fotoItem }} {{ ordemDeProducao.cancelada }} 
+        </li>
+        </ul>
+
+        <button class="m-3 btn btn-sm btn-danger" (click)="removeAllOrdensDeProducao()">
+        Remover Tudo
+        </button>
+    </div>
+    <div class="col-md-6">
+        <div *ngIf="currentOrdemDeProducao.id">
+        <h4>OrdemDeProducao</h4>
+        <div>
+            <label><strong>Código:</strong></label> {{ currentOrdemDeProducao.codigo }}
+        </div>
+        <div>
+            <label><strong>ItemDeOP:</strong></label> {{ currentOrdemDeProducao.itemDeOP }}
+        </div>
+        <div>
+            <label><strong>Pedido:</strong></label> {{ currentOrdemDeProducao.pedido }}
+        </div>
+        <div>
+            <label><strong>NomeCliente:</strong></label> {{ currentOrdemDeProducao.nomeCliente }}
+        </div>
+        <div>
+            <label><strong>Data:</strong></label> {{ currentOrdemDeProducao.data }}
+        </div>
+        <div>
+            <label><strong>Prazo:</strong></label> {{ currentOrdemDeProducao.prazo }}
+        </div>
+        <div>
+            <label><strong>CodigoItem:</strong></label> {{ currentOrdemDeProducao.codigoItem }}
+        </div>
+        <div>
+            <label><strong>DescricaoItem:</strong></label> {{ currentOrdemDeProducao.descricaoItem }}
+        </div>
+        <div>
+            <label><strong>Quantidade:</strong></label> {{ currentOrdemDeProducao.quantidade }}
+        </div>
+        <div>
+            <label><strong>FotoItem:</strong></label> {{ currentOrdemDeProducao.fotoItem }}
+        </div>
+        <div>
+            <label><strong>Cancelada:</strong></label> {{ currentOrdemDeProducao.cancelada }}
+        </div>
+
+        <a class="badge badge-warning" routerLink="{{ currentOrdemDeProducao.id }}/edit">
+            Editar
+        </a>
+        </div>
+
+        <div *ngIf="!currentOrdemDeProducao">
+        <br />
+        <p>Por favor selecione uma linha da lista de OrdemDeProducao...</p>
+        </div>
+    </div>
+</div>

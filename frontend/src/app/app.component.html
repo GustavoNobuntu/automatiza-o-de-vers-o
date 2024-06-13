@@ -1,0 +1,51 @@
+  <mat-sidenav-container class="sidenav-container"> 
+    <mat-sidenav #drawer class="sidenav" fixedInViewport 
+        [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'" 
+        [mode]="(isHandset$ | async) ? 'over' : 'side'" 
+        [opened]="(isHandset$ | async) === false"> 
+      <mat-toolbar>ProdAgil</mat-toolbar> 
+   <mat-nav-list>
+        <a mat-list-item routerLink="funcionario" (mouseup)="drawer.toggle()">Funcionario</a> 
+        <a mat-list-item routerLink="item" (mouseup)="drawer.toggle()">Item</a> 
+        <a mat-list-item routerLink="apontamentoDeProducao" (mouseup)="drawer.toggle()">ApontamentoDeProducao</a> 
+        <a mat-list-item routerLink="ordemDeProducao" (mouseup)="drawer.toggle()">OrdemDeProducao</a> 
+        <a mat-list-item routerLink="relatorioDeProducao" (mouseup)="drawer.toggle()">RelatorioDeProducao</a> 
+      </mat-nav-list>
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <mat-toolbar color="primary" class="toolbar" #nav>
+        <button
+          type="button"
+          aria-label="Toggle sidenav"
+          mat-icon-button
+          (click)="drawer.toggle()"
+          *ngIf="isHandset$ | async">
+          <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+        </button>
+        <span>{{nomePagina}}</span>
+      </mat-toolbar>
+      <div class="fix"></div>
+        <router-outlet class="container"></router-outlet>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+  <mat-toolbar class="toolbarNav">
+    <button mat-flat-button routerLinkActive="active-link" routerLink="/funcionario">
+      <mat-icon class="material-icons color_blue">
+        home_border</mat-icon>
+    </button>
+      <button mat-button [matMenuTriggerFor]="menu"
+      mat-flat-button routerLinkActive="active-link" ><mat-icon class="addButton" id="mat-icon">add_border
+      </mat-icon></button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item routerLink="/funcionario/new">Funcionarios</button>
+    <button mat-menu-item routerLink="/item/new">Itens</button>
+    <button mat-menu-item routerLink="/apontamentoDeProducao/new">ApontamentosDeProducao</button>
+    <button mat-menu-item routerLink="/ordemDeProducao/new">OrdensDeProducao</button>
+    <button mat-menu-item routerLink="/relatorioDeProducao/new">RelatoriosDeProducao</button>
+  </mat-menu>
+    <button mat-flat-button routerLink="/history" routerLinkActive="active-link">
+      <mat-icon class="material-icons color_blue">assignment_turned_in_border</mat-icon>
+    </button>
+  </mat-toolbar>
+
+
