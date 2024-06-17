@@ -7,7 +7,7 @@ import { BaseResourceFormComponent } from '../form/form.component';
 import { BaseResourceModel } from 'app/shared/models/base-resource.model';
 import { BaseResourceService } from 'app/shared/services/shared.service';
 //import { VariationService } from 'app/modules/variations/shared/variations.service';
-i//mport { OrderService } from 'app/modules/orders/shared/order.service';
+//mport { OrderService } from 'app/modules/orders/shared/order.service';
 
 @Component({
   selector: 'app-mat-stepper-form',
