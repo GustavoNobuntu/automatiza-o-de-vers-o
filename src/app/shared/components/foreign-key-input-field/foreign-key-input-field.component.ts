@@ -5,6 +5,7 @@ import { DefaultListComponent, IDefaultListComponentDialogConfig } from '../defa
 import { Subject, take, takeUntil } from 'rxjs';
 import { SelectedItemsListComponent } from '../selected-items-list/selected-items-list.component';
 import { DinamicBaseResourceFormComponent, IDinamicBaseResourceFormComponent } from '../dinamic-base-resource-form/dinamic-base-resource-form.component';
+import { IPageStructure, ISearchableField } from 'app/shared/models/pageStructure';
 
 enum ISelectionOption {
   add,
@@ -59,7 +60,7 @@ export class ForeignKeyInputFieldComponent implements OnDestroy, AfterViewInit {
   /**
    * Dados que orientam a criação da pagina
    */
-  @Input() dataToCreatePage: object | null;
+  @Input() dataToCreatePage: IPageStructure | null;
   @Input() value: any;
   /**
    * Campo no formulário que receberá os dados dos valores selecionados.
@@ -91,6 +92,8 @@ export class ForeignKeyInputFieldComponent implements OnDestroy, AfterViewInit {
    */
   private ngUnsubscribe = new Subject();
 
+  enableToEdit: boolean = false;
+
   constructor(
     private matDialog: MatDialog,
   ) { }
@@ -109,26 +112,49 @@ export class ForeignKeyInputFieldComponent implements OnDestroy, AfterViewInit {
    * @param valueDisplayed Valores que são apresentados no campo de inserção do componente atual
    */
   setDisplayedValue(inputValue: FormControl, valueDisplayed: string) {
+    var searchableProperty: string;
+    var hasProperty : boolean;
+
     //Se não tiver nada ele só define vazio no campo apresentável
     if (inputValue.value == null || inputValue.value.length == 0) {
       this.displayedValue = [""];
+      this.enableToEdit = false;
       return;
     };
+    this.enableToEdit = true;
 
     //Verifica se o item contido na FormControl é um array
     if (inputValue.value instanceof Array) {
-      if (inputValue.value[0].hasOwnProperty(valueDisplayed) == false) {
-        valueDisplayed = "id";
+      hasProperty = inputValue.value.some(obj => obj.hasOwnProperty(valueDisplayed) == true);
+    } else {
+      hasProperty = inputValue.value.hasOwnProperty(valueDisplayed)
+    }
+
+    if (hasProperty == true) {
+      searchableProperty = this.fieldDisplayedInLabel;
+    } else {
+      if (inputValue.value instanceof Array) {
+        searchableProperty = this.getFirstNonIdKey(inputValue.value[0]);
+      } else {
+        searchableProperty = this.getFirstNonIdKey(inputValue.value);
+      }
+    }
+
+    //Verifica se o item contido na FormControl é um array
+    if (inputValue.value instanceof Array) {
+
+      var _displayedValues;
+
+      for (const obj of inputValue.value) {
+
+        _displayedValues.push(obj[searchableProperty]);
+
       }
 
-      this.displayedValue = inputValue.value.map(value => value[valueDisplayed]);
+      this.displayedValue = _displayedValues;
 
     } else {
-      //Caso não for array
-      if (inputValue.value[valueDisplayed] == undefined) {
-        valueDisplayed = "id";
-      }
-      this.displayedValue = inputValue.value[valueDisplayed];
+      this.displayedValue = inputValue.value[searchableProperty];
     }
   }
 
@@ -143,7 +169,7 @@ export class ForeignKeyInputFieldComponent implements OnDestroy, AfterViewInit {
       userConfig: null,
       selectedItemsLimit: this.selectedItemsLimit,
       apiUrl: this.value.apiUrl,
-      searchableFields: null,
+      searchableFields: this.getSearchableFields(this.dataToCreatePage, this.className),
       isSelectable: true,
       className: this.fieldName,//É fieldName pois aqui será editado a campo que está na classe do ClasNa
       isAbleToCreate: false,
@@ -175,8 +201,15 @@ export class ForeignKeyInputFieldComponent implements OnDestroy, AfterViewInit {
 
   openSelectableItemsListDialogToEditItems() {
 
+    var items : Object[];
+    if(this.inputValue.value instanceof Array == false){
+      items = [this.inputValue.value];
+    } else {
+      items = this.inputValue.value;
+    }
+
     const config: IDefaultListComponentDialogConfig = {
-      itemsDisplayed: this.inputValue.value,
+      itemsDisplayed: items,
       columnsQuantity: 2,
       displayedfieldsName: this.value.propertiesAttributes.map(attribute => attribute.name),
       fieldsType: this.value.propertiesAttributes.map(attribute => attribute.type),
@@ -195,7 +228,6 @@ export class ForeignKeyInputFieldComponent implements OnDestroy, AfterViewInit {
       isEnabledToGetDataFromAPI: false
     }
 
-    // const dialogRef = this.matDialog.open(SelectedItemsListComponent, {
     const dialogRef = this.matDialog.open(DefaultListComponent, {
       width: '100%',
       height: '100%',
@@ -206,7 +238,7 @@ export class ForeignKeyInputFieldComponent implements OnDestroy, AfterViewInit {
     });
 
     dialogRef.afterClosed().pipe(take(1)).subscribe(result => {
-      // console.log("O retorno do edit foi:", result);
+      console.log("O retorno do edit foi:", result);
       if (result == null) return;
       this.selectItems(result, ISelectionOption.set);
     });
@@ -233,8 +265,6 @@ export class ForeignKeyInputFieldComponent implements OnDestroy, AfterViewInit {
       itemId: data?.id,
       currentAction: currentAction,
     }
-
-    console.log("Dados para abertura do formulário de criação: ", config);
 
     const dialogRef = this.matDialog.open(DinamicBaseResourceFormComponent, {
       width: '100%',
@@ -299,17 +329,22 @@ export class ForeignKeyInputFieldComponent implements OnDestroy, AfterViewInit {
   }
 
   setNewValueToInput(newItems: object[]) {
-    var objectsID: string[] = [];//Armazenará os IDs dos objetos que foram selecinados/adicionados
+    //var objectsID: string[] = [];//Armazenará os IDs dos objetos que foram selecinados/adicionados
     var displayedValues: string[] = [];//Valores apresentáveis dos objetos
+    var searchableProperty: string;
+
+    const hasProperty = newItems.some(obj => obj.hasOwnProperty(this.fieldDisplayedInLabel) == true);
+
+    if (hasProperty == true) {
+      searchableProperty = this.fieldDisplayedInLabel;
+    } else {
+      searchableProperty = this.getFirstNonIdKey(newItems[0]);
+    }
 
     for (const obj of newItems) {
-      if (obj.hasOwnProperty('id')) {
-        objectsID.push(obj["id"]);
-      }
 
-      if (obj.hasOwnProperty(this.fieldDisplayedInLabel)) {
-        displayedValues.push(obj[this.fieldDisplayedInLabel]);
-      }
+      displayedValues.push(obj[searchableProperty]);
+
     }
 
     this.inputValue.setValue(newItems);
@@ -317,6 +352,30 @@ export class ForeignKeyInputFieldComponent implements OnDestroy, AfterViewInit {
 
     this.displayedValue = displayedValues;
     // console.log("displayedValue contém: ",this.displayedValue);
+  }
+
+  getFirstNonIdKey(obj: Object): string | null {
+    const keys = Object.keys(obj);
+    for (let key of keys) {
+      if (key !== 'id' && key !== '_id') {
+        return key;
+      }
+    }
+    return null; // Se não houver nenhuma chave além de 'id'
+  }
+
+  getSearchableFields(dataToCreatePage: IPageStructure, className: string): ISearchableField[]{
+    var _searchableFields : ISearchableField[] = [];
+
+    var attribute = dataToCreatePage.attributes.find(attribute => attribute.name === className);
+
+    attribute.searchable.map(searchableField =>{
+
+      var propertie = attribute.properties.find(propertie => propertie.name === searchableField);
+      _searchableFields.push({name: searchableField, type: propertie.type}) 
+    });
+
+    return _searchableFields;
   }
 
 }
