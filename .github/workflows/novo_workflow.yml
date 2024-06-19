@@ -30,4 +30,4 @@ jobs:
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: npx semantic-release --debug
       env:
-        GH_TOKEN: ${{secrets.GH_TOKEN}}
+        GH_TOKEN: ${{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}}
