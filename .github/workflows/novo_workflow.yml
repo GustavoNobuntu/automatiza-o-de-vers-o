@@ -28,6 +28,6 @@ jobs:
 
     - name: Release
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: npx semantic-release --debug --no-ci
+      run: npx semantic-release --no-ci
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN  }}
