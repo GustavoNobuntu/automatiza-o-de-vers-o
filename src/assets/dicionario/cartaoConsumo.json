@@ -7,11 +7,14 @@
         "route": "cartaoConsumo",
         "localStorage": true,
         "filter": true,
-        "searchableFields": ["numeroCartao", "clientes"],
+        "searchableFields": [
+            "numeroCartao",
+            "clientes"
+        ],
         "addNew": true,
-        "edit": true,
+        "edit": false,
         "columnsQuantity": 3,
-        "delete": true,
+        "delete": false,
         "isFormStepper": false,
         "isLinearFormStepper": false
     },
@@ -31,7 +34,7 @@
             "type": "foreignKey",
             "className": "Cliente",
             "many": false,
-            "apiUrl": "api/clientes",
+            "apiUrl": "api/cliente",
             "fieldDisplayedInLabel": "nome",
             "visibleCard": true,
             "visibleGrid": true,
@@ -40,7 +43,9 @@
             "forageinKey": "id",
             "lookup": true,
             "viewDetails": true,
-            "searchable": ["nome"],
+            "searchableFields": [
+                "nome"
+            ],
             "addNew": true,
             "properties": [
                 {

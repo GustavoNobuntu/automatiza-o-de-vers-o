@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, EventEmitter, Inject, Injector, Input, OnDestroy, Optional, Output, ViewChild, ViewContainerRef } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { Observable, Subject, take, takeUntil } from 'rxjs';
+import { finalize, Observable, Subject, take, takeUntil, tap } from 'rxjs';
 import { SelectableCardComponent } from '../selectable-card/selectable-card.component';
 import { HttpClient } from '@angular/common/http';
 import { DefaultCardComponent } from '../default-card/default-card.component';
@@ -10,6 +10,7 @@ import { ConfirmationDialogComponent, IConfirmationDialog } from '../confirmatio
 import { DinamicBaseResourceFormComponent, IDinamicBaseResourceFormComponent } from '../dinamic-base-resource-form/dinamic-base-resource-form.component';
 import { environment } from 'environments/environment';
 import { ISearchableField } from '../search-input-field/search-input-field.component';
+import { IPageStructure } from 'app/shared/models/pageStructure';
 
 export interface IDefaultListComponentDialogConfig {
   /**
@@ -17,21 +18,78 @@ export interface IDefaultListComponentDialogConfig {
    * @example ['nome':'Maria', 'idade':'44'].
    */
   itemsDisplayed: any[],
+  /**
+   * Quantidade de colunas que tenha cada Card da lista.
+   * @example "3"
+   * Por padrão quando se está em dispositivos móveis a quantidade de colunas será 1.
+   */
   columnsQuantity: number,
+  /**
+   * Nomes dos campos que serão apresentados.
+   * @example ['nome', 'idade'].
+   */
   displayedfieldsName: string[],
+  /**
+   * Tipos das variáveis da classe.
+   * @example ['string', 'number'].
+   */
   fieldsType: string[],
+  /**
+   * Caso o conter um campo do tipo objeto, será o nome do campo que está dentro do que será exibido. 
+   * [Exemplo]: O campo tem um objeto, esse objeto tem "id", "name" e "age". O campo apresentado poderá ser o "name", assim aparecerá o valor do campo "name" no componente.
+   * @example ['', '', 'id']
+   */
   objectDisplayedValue: string[]
   userConfig: any,
+  /**
+   * Limite de itens que podem ser selecionados na lista
+   */
   selectedItemsLimit: number,
+  /**
+   * Link no qual é capaz de obter as instâncias dessa classe no banco de dados.\
+   * @example "api/carros"
+   */
   apiUrl: string,
+  /**
+   * Campos pelo qual será realizada a busca no campo de buscas.\
+   * @example ['name','phone'].
+   */
   searchableFields: ISearchableField[] | null,
+  /**
+   * Essa lista será uma lista que tu seleciona os itens?
+   * @example true;
+   */
   isSelectable: boolean,
+  /**
+   * Nome da classe na qual o formulário pertence
+   */
   className: string,
+  /**
+   * Indica se a lista terá botão que direcionará para criação de novos itens.
+   * @example "true" ou "false"
+   */
   isAbleToCreate: boolean,
+  /**
+   * Indica que cada card da lista terá um botão que direcionará para editar cada item.
+   * @example "true" ou "false"
+   */
   isAbleToEdit: boolean,
+  /**
+   * Indica que cada item da lista poderá ser removido.
+   * @example "true" ou "false"
+   */
   isAbleToDelete: boolean,
-  dataToCreatePage: object,
+  /**
+   * Dados que orienta na criação das paginas.
+   */
+  dataToCreatePage: IPageStructure,
+  /**
+   * Define se o formulários que serão abertos a partir dessa lista serão abertos por dialog ou indo na página
+   */
   useFormOnDialog: boolean,
+  /**
+   * Define se a lista irá obter os dados da API para apresentar para o usuário.
+   */
   isEnabledToGetDataFromAPI: boolean
 }
 
@@ -40,85 +98,29 @@ export interface IDefaultListComponentDialogConfig {
   templateUrl: './default-list.component.html',
   styleUrls: ['./default-list.component.scss']
 })
-export class DefaultListComponent implements AfterViewInit, OnDestroy {
-  /**
-   * Campo com os dados dos itens que serÃo apresenados na lista.
-   * @example ['nome':'Maria', 'idade':'44'].
-   */
+export class DefaultListComponent implements AfterViewInit, OnDestroy, IDefaultListComponentDialogConfig {
   @Input() itemsDisplayed: any[] = [];
-  /**
-   * Quantidade de colunas que tenha cada Card da lista.
-   * @example "3"
-   * Por padrão quando se está em dispositivos móveis a quantidade de colunas será 1.
-   */
   @Input() columnsQuantity: number = 1;
-  /**
-   * Nomes dos campos que serão apresentados.
-   * @example ['nome', 'idade'].
-   */
   @Input() displayedfieldsName: string[] | null;
-  /**
-   * Tipos das variáveis da classe.
-   * @example ['string', 'number'].
-   */
   @Input() fieldsType: string[];
-  
-  /**
-   * Caso o conter um campo do tipo objeto, será o nome do campo que está dentro do que será exibido. 
-   * [Exemplo]: O campo tem um objeto, esse objeto tem "id", "name" e "age". O campo apresentado poderá ser o "name", assim aparecerá o valor do campo "name" no componente.
-   * @example ['', '', 'id']
-   */
   @Input() objectDisplayedValue: string[]
-
   @Input() userConfig: any;
-  /**
-   * Essa lista será uma lista que tu seleciona os itens?
-   * @example true;
-   */
   @Input() isSelectable: boolean = true;
-  /**
-   * Valor máximo de itens que podem ser selecionados.
-   * @example 2.\
-   * Exemplo permitir selecionar tudo: null.
-   */
   @Input() selectedItemsLimit: number | null = null;
   /**
    * Campo que saída para os valores que foram selecionados.
    */
   @Output() eventSelectedValues = new EventEmitter<any[]>();
-  /**
-   * Link no qual é capaz de obter as instâncias dessa classe no banco de dados.\
-   * @example "api/carros"
-   */
   @Input() apiUrl!: string;
-  /**
-   * Campos pelo qual será realizada a busca no campo de buscas.\
-   * @example ['name','phone'].
-   */
   @Input() searchableFields: ISearchableField[] | null = null;
   /**
   * Número máximo de itens que serão renderizados na lista.\
   * @example 3
   */
   @Input() maxDisplayedItems: number = 25;
-  /**
-   * Nome da classe na qual o formulário pertence
-   */
   @Input() className!: string;
-  /**
-   * Indica se a lista terá botão que direcionará para criação de novos itens.
-   * @example "true" ou "false"
-   */
   @Input() isAbleToCreate: boolean = true;
-  /**
-   * Indica que cada card da lista terá um botão que direcionará para editar cada item.
-   * @example "true" ou "false"
-   */
   @Input() isAbleToEdit: boolean = true;
-  /**
-   * Indica que cada item da lista poderá ser removido.
-   * @example "true" ou "false"
-   */
   @Input() isAbleToDelete: boolean = true;
   /**
    * Subject responsável por remover os observadores que estão rodando na pagina no momento do componente ser deletado.
@@ -143,26 +145,19 @@ export class DefaultListComponent implements AfterViewInit, OnDestroy {
    * @example "true" ou "false"
    */
   isOpenedOnDialog: boolean = false;
-  /**
-   * Dados que orienta na criação das paginas.
-   */
-  @Input() dataToCreatePage: object;
+  @Input() dataToCreatePage: IPageStructure;
   /**
    * Rota que levará para pagina da classe
    */
   @Input() route: string;
-  /**
-   * Define se a lista irá obter os dados da API para apresentar para o usuário.
-   */
   @Input() isEnabledToGetDataFromAPI: boolean = true;
   /**
    * Define se o menu é fixado na tela
    */
-  @Input() menuIsFixedOnScreen : boolean = true;
-  /**
-   * Define se o formulários que serão abertos a partir dessa lista serão abertos por dialog ou indo na página
-   */
-  @Input() useFormOnDialog : boolean = false;
+  @Input() menuIsFixedOnScreen: boolean = true;
+  @Input() useFormOnDialog: boolean = false;
+
+  isLoading: boolean = true;
 
   @ViewChild('placeToRender', { read: ViewContainerRef }) target!: ViewContainerRef;
 
@@ -213,8 +208,10 @@ export class DefaultListComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      if(this.isEnabledToGetDataFromAPI == true){
-        this.getData(this.apiUrl);
+      if (this.isEnabledToGetDataFromAPI == true) {
+        this.getDataFromAPI(this.apiUrl);
+      } else {
+        this.getData(this.itemsDisplayed);
       }
     }, 0);
   }
@@ -223,19 +220,51 @@ export class DefaultListComponent implements AfterViewInit, OnDestroy {
    * Realiza a requisição na API para obter os dados e popular a lista.
    * @param apiURL Campos pelo qual será realizada a busca no campo de buscas. @example "api/carros"
    */
-  getData(apiURL: string) {
+  getDataFromAPI(apiURL: string) {
 
-    this.requestAllValuesFromAPI(apiURL).pipe(take(1)).subscribe((itemsDisplayed) => {
-      this.itemsDisplayed = itemsDisplayed;
+    this.requestAllValuesFromAPI(apiURL).pipe(
+      take(1),
+      //Enquanto o observable está mandando os dados, fará oque tem na função
+      tap(() => {
+        this.isLoading = true;
+      }),
+      //Quando o observable completa ou encontra um erro
+      finalize(() => {
+        this.isLoading = false;
+      }),
+    ).subscribe({
+      next: (itemsDisplayed) => {
+        this.itemsDisplayed = itemsDisplayed;
 
-      if (itemsDisplayed.length == 0) return;
+        if (itemsDisplayed.length == 0) return;
+        // console.log("Itens obtidos na requisição: ", itemsDisplayed);
 
-      if (this.maxDisplayedItems > this.itemsDisplayed.length) this.maxDisplayedItems = this.itemsDisplayed.length;
+        if (this.maxDisplayedItems > this.itemsDisplayed.length) this.maxDisplayedItems = this.itemsDisplayed.length;
 
-      const itemsToDisplay = this.itemsDisplayed.slice(0, this.maxDisplayedItems);
+        const itemsToDisplay = this.itemsDisplayed.slice(0, this.maxDisplayedItems);
 
-      this.createItemsOnList(itemsToDisplay);
+        this.createItemsOnList(itemsToDisplay);
+      },
+      error(error) {
+
+        if(error.status != null){
+          // alert(this.translocoService.translate("componentsBase.requestError.error-401"))
+        }
+
+      }
     });
+  }
+
+  getData(itemsDisplayed: Object[]) {
+    if (itemsDisplayed.length == 0) return;
+
+    this.isLoading = false;
+
+    if (this.maxDisplayedItems > itemsDisplayed.length) this.maxDisplayedItems = itemsDisplayed.length;
+
+    const itemsToDisplay = itemsDisplayed.slice(0, this.maxDisplayedItems);
+
+    this.createItemsOnList(itemsToDisplay);
   }
 
   /**
@@ -265,7 +294,7 @@ export class DefaultListComponent implements AfterViewInit, OnDestroy {
 
       componentCreated.fieldsType = this.fieldsType;
       componentCreated.objectDisplayedValue = this.objectDisplayedValue;
-      
+
       componentCreated.className = this.className;
 
       if (this.isSelectable == true) {
@@ -283,11 +312,12 @@ export class DefaultListComponent implements AfterViewInit, OnDestroy {
    * Encaminha para pagina de edição.
    * @param item Dados do item que será alterado. @example [{"name":"Marie", "age":22}.
    */
-  editItem(item) {
+  editItem(item: Object) {
+    // console.log("Objeto que será alterado: ",item)
     if (this.useFormOnDialog == true) {
-      this.openFormOnDialog("edit", item.id);
+      this.openFormOnDialog("edit", item["id"]);
     } else {
-      this.goToEditPage(item.id);
+      this.goToEditPage(item["id"]);
     }
   }
 
@@ -297,11 +327,11 @@ export class DefaultListComponent implements AfterViewInit, OnDestroy {
    * @returns 
    */
   goToEditPage(itemId: string) {
-    if(this.route == undefined || this.route == null){
+    if (this.route == undefined || this.route == null) {
       console.warn("O valor de 'route' não foi passado corretamente");
       return;
     }
-    this.router.navigate([this.route+"/" + itemId + "/edit"]);
+    this.router.navigate([this.route + "/" + itemId + "/edit"]);
   }
 
   /**
@@ -309,13 +339,13 @@ export class DefaultListComponent implements AfterViewInit, OnDestroy {
    * @param action Qual ação será feita, sendo criação "new" ou edição "edit"
    * @param _itemId Id do item que será editado. Se for criado então pode ser "null" o valor preenchido no campo
    */
-  openFormOnDialog(action: string, _itemId : string | null){
-    if(action !== "edit" && action !== "new") return;
-    if(this.useFormOnDialog == false) return; 
+  openFormOnDialog(action: string, _itemId: string | null) {
+    if (action !== "edit" && action !== "new") return;
+    if (this.useFormOnDialog == false) return;
 
     console.log("Dados para criação do form através da lista: ", this.dataToCreatePage)
 
-    const config : IDinamicBaseResourceFormComponent = {
+    const config: IDinamicBaseResourceFormComponent = {
       dataToCreatePage: this.dataToCreatePage,
       className: this.className,
       currentAction: action,
@@ -344,8 +374,8 @@ export class DefaultListComponent implements AfterViewInit, OnDestroy {
   /**
    * Encaminha para pagina de criação
    */
-  createItem(){
-    if(this.isAbleToCreate == false) return;
+  createItem() {
+    if (this.isAbleToCreate == false) return;
 
     if (this.useFormOnDialog == true) {
       this.openFormOnDialog("new", null);
@@ -357,13 +387,13 @@ export class DefaultListComponent implements AfterViewInit, OnDestroy {
   /**
    * Redirecina para pagina de criação do item 
    */
-  gotToCreationPage(){
-    if(this.route == undefined || this.route == null){
+  gotToCreationPage() {
+    if (this.route == undefined || this.route == null) {
       console.warn("O valor de 'route' não foi passado corretamente");
       return;
     }
 
-    this.router.navigate([this.route+"/new"]);
+    this.router.navigate([this.route + "/new"]);
   }
 
   selectableFieldController(componentCreated: SelectableCardComponent) {
@@ -385,7 +415,7 @@ export class DefaultListComponent implements AfterViewInit, OnDestroy {
 
     //Se o componente não foi selencionado
     if (dataIsSelected == false) {
-      
+
       if (selectedItemsLimit != null) {
         //Se o limite de itens selecionados não foi ultrapassado
         if (this.selectedItems.length < selectedItemsLimit) {
@@ -436,7 +466,7 @@ export class DefaultListComponent implements AfterViewInit, OnDestroy {
     return instance[variableName]
   }
 
-  
+
   onSelectedItemsCheckBoxChange(event) {
     this.selectAllCheckBox = event.checked;
     if (event.checked == true) {
@@ -478,7 +508,7 @@ export class DefaultListComponent implements AfterViewInit, OnDestroy {
    * @returns Retorna um observador que irá observar os dados que serão retornados da API.
    */
   requestAllValuesFromAPI(apiUrl: string): Observable<any> {
-    return this.http.get(environment.backendUrl+'/'+apiUrl);
+    return this.http.get(environment.backendUrl + '/' + apiUrl);
   }
 
   ngOnDestroy(): void {
@@ -502,7 +532,7 @@ export class DefaultListComponent implements AfterViewInit, OnDestroy {
       if (result == true) {
 
         this.selectedItems.forEach((item) => {
-          this.http.delete(environment.backendUrl+"/"+this.apiUrl + '/' + item.id).subscribe({
+          this.http.delete(environment.backendUrl + "/" + this.apiUrl + '/' + item.id).subscribe({
             error: (error) => alert(this.translocoService.translate("componentsBase.Alerts.deleteErrorMessage")),
           }).unsubscribe();
         });
@@ -511,7 +541,7 @@ export class DefaultListComponent implements AfterViewInit, OnDestroy {
 
         alert(this.translocoService.translate("componentsBase.Alerts.deleteSuccessMessage"));
 
-        this.getData(this.apiUrl);
+        this.getDataFromAPI(this.apiUrl);
       }
 
     });
@@ -542,10 +572,10 @@ export class DefaultListComponent implements AfterViewInit, OnDestroy {
    * @returns Retorna uma referência do componente de confirmação que foi aberto na página atual.
    */
   openConfirmationDialog(message: string): MatDialogRef<ConfirmationDialogComponent> {
-    const confirmationDialog : IConfirmationDialog = {
+    const confirmationDialog: IConfirmationDialog = {
       message: message
     }
-    console.log(message);
-    return this.matDialog.open(ConfirmationDialogComponent, {data: confirmationDialog});
+    // console.log(message);
+    return this.matDialog.open(ConfirmationDialogComponent, { data: confirmationDialog });
   }
 }

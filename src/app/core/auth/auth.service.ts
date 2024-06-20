@@ -25,12 +25,12 @@ export class AuthService {
     private _httpClient: HttpClient,
     private sessionService: SessionService,
   ) {
-    
+
     const settings: UserManagerSettings = {
       authority: environment.authority,
       client_id: environment.client_id,
-      redirect_uri: environment.redirect_uri,
-      post_logout_redirect_uri: environment.post_logout_redirect_uri,
+      redirect_uri: environment.frontendUrl + '/' + environment.redirect_uri,
+      post_logout_redirect_uri: environment.frontendUrl + '/' + environment.post_logout_redirect_uri,
       response_type: 'code',
       scope: environment.scope,
       
@@ -50,19 +50,31 @@ export class AuthService {
   }
 
   get accessToken(): string {
-    var sessionData = sessionStorage.getItem('oidc.user:https://'+environment.provider+'/'+environment.tenant_id+'/'+environment.signInPolitical+'/v2.0/:'+environment.client_id) ?? '';
-    const parsedData = JSON.parse(sessionData);
-    return parsedData?.access_token || '';
+
+    try {
+      var sessionData = sessionStorage.getItem('oidc.user:https://'+environment.provider+'/'+environment.tenant_id+'/'+environment.signInPolitical+'/v2.0/:'+environment.client_id) ?? '';
+      const parsedData = JSON.parse(sessionData);
+      return parsedData?.access_token || '';
+    } catch (e) {
+      return null;
+    }
+
   }
 
   get userUID(): string {
-    var sessionData = sessionStorage.getItem('oidc.user:https://'+environment.provider+'/'+environment.tenant_id+'/'+environment.signInPolitical+'/v2.0/:'+environment.client_id) ?? '';
-    const parsedData = JSON.parse(sessionData);
-    return parsedData?.profile.oid || '';
+
+    try {
+      var sessionData = sessionStorage.getItem('oidc.user:https://'+environment.provider+'/'+environment.tenant_id+'/'+environment.signInPolitical+'/v2.0/:'+environment.client_id) ?? '';
+      const parsedData = JSON.parse(sessionData);
+      return parsedData?.profile.oid || '';
+    } catch (e) {
+      return '';
+    }
+    
   }
 
-  login(): void {
-    this.userManager.signinRedirect();
+  login(): Promise<void> {
+    return this.userManager.signinRedirect();
   }
 
   async completeAuthentication(): Promise<void> {
@@ -88,28 +100,19 @@ export class AuthService {
   check(): Observable<boolean> {
 
     // Verificar se o usuário está logado
-    // console.log("Está sendo feito a verificação do guard");
-    // console.log("authenticated :", this._authenticated);
-    // if (this._authenticated) {
-    //   return of(true);
-    // }
-    // // Verificar se ele não tem o accessToken
-    // console.log("Access token: ", this.accessToken);
-    // if (!this.accessToken) {
-    //   return of(false)
-    // }
-    // // Verificação se o token expirou
-    // if (AuthUtils.isTokenExpired(this.accessToken) == false) {
-    //   return of(true);
-    // }
+    if (this._authenticated) {
+      return of(true);
+    }
 
     if (this.isLoggedIn() == true) {
       return of(true);
     }
 
+    if(this.accessToken != null && this.accessToken != ''){
+      return of(true);
+    }
+
     return of(false);
-    // If the access token exists and it didn't expire, sign in using it
-    // return this.signInUsingToken();
   }
 
   /**
