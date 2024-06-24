@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/GustavoNobuntu/automatiza-o-de-vers-o/compare/v1.0.0...v1.0.1) (2024-06-24)
+
+
+### Bug Fixes
+
+* **pencil:** testando ao uso da branch fix ([3853469](https://github.com/GustavoNobuntu/automatiza-o-de-vers-o/commit/3853469595816f1678f1d3e624ef11213067805b))
+
 # 1.0.0 (2024-06-21)
 
 
