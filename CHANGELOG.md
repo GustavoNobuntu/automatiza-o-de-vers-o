@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/GustavoNobuntu/automatiza-o-de-vers-o/compare/v2.1.0...v2.2.0) (2024-06-24)
+
+
+### Features
+
+* **pencil:** testando os ups na main e usando o bash ([d7053e9](https://github.com/GustavoNobuntu/automatiza-o-de-vers-o/commit/d7053e995ccb068510bca3e975b6914a43928004))
+
 # [2.1.0](https://github.com/GustavoNobuntu/automatiza-o-de-vers-o/compare/v2.0.0...v2.1.0) (2024-06-24)
 
 
