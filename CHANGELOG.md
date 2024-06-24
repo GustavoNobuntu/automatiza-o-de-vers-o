@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/GustavoNobuntu/automatiza-o-de-vers-o/compare/v1.0.1...v1.1.0) (2024-06-24)
+
+
+### Features
+
+* **pencil:** testando a feature featuer ([16d56a6](https://github.com/GustavoNobuntu/automatiza-o-de-vers-o/commit/16d56a63262d9e9ec8b13637f4ccb182f0014135))
+
 ## [1.0.1](https://github.com/GustavoNobuntu/automatiza-o-de-vers-o/compare/v1.0.0...v1.0.1) (2024-06-24)
 
 
