@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/GustavoNobuntu/automatiza-o-de-vers-o/compare/v1.1.0...v2.0.0) (2024-06-24)
+
+
+### Performance Improvements
+
+* **pencil:** verificando o uso da feture BREAKING CHANGE ([1d96d29](https://github.com/GustavoNobuntu/automatiza-o-de-vers-o/commit/1d96d29ab72f5d9297e921c63e6131b021345c36))
+
+
+### BREAKING CHANGES
+
+* **pencil:** TESTANDO !!!!PERIGO!!!!
+
 # [1.1.0](https://github.com/GustavoNobuntu/automatiza-o-de-vers-o/compare/v1.0.1...v1.1.0) (2024-06-24)
 
 
