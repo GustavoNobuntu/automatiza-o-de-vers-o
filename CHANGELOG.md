@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/GustavoNobuntu/automatiza-o-de-vers-o/compare/v2.0.0...v2.1.0) (2024-06-24)
+
+
+### Features
+
+* **pencil:** mudando as configurações do git actions ([de4a5af](https://github.com/GustavoNobuntu/automatiza-o-de-vers-o/commit/de4a5af4d0d38c04d83cc23a87b561f7c4971689))
+
 # [2.0.0](https://github.com/GustavoNobuntu/automatiza-o-de-vers-o/compare/v1.1.0...v2.0.0) (2024-06-24)
 
 
