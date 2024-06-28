@@ -21,22 +21,13 @@ jobs:
       - run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install GitHub CLI
-        run: sudo apt-get install gh -y
-      - name: Get latest issue number
-        id: get_issue
-        run: |
-          latest_issue=$(gh issue list --limit 1 --json number --jq '.[0].number')
-          echo "::set-output name=ISSUE_NUMBER::$latest_issue"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Close issue
         uses: octokit/request-action@v2
         with:
           route: PATCH /repos/:owner/:repo/issues/:issue_number
           owner: ${{ github.repository_owner }}
           repo: ${{ github.event.repository.name }}
-          issue_number: ${{ steps.get_issue.outputs.ISSUE_NUMBER }}
+          issue_number: 2 # Altere para o número da sua issue
           state: closed
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
