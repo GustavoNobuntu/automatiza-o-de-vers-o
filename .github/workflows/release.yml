@@ -26,13 +26,18 @@ jobs:
       - name: Get latest issue number
         id: get_issue
         run: |
-          latest_issue=$(gh issue list --limit 1 --json number --jq '.[0].number')
-          echo "::set-output name=ISSUE_NUMBER::$latest_issue"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMIT_MESSAGE="${{ steps.get_commit.outputs.COMMIT_MESSAGE }}"
+          if [[ "$COMMIT_MESSAGE" =~ ([Cc]lose[sd]?|[Ff]ix(e[sd])?|[Rr]esolve[sd]?)\s#([0-9]+) ]]; then
+            ISSUE_NUMBER="${BASH_REMATCH[2]}"
+            echo "::set-output name=ISSUE_NUMBER::$ISSUE_NUMBER"
+          else
+            echo "No issue number found"
+            exit 1
+          fi
       - name: Close issue
         uses: peter-evans/close-issue@v1
+        if: success() && steps.extract_issue.outputs.ISSUE_NUMBER != ''
         with:
-          issue-number: ${{ steps.get_issue.outputs.ISSUE_NUMBER }}
+          issue-number: ${{ steps.extract_issue.outputs.ISSUE_NUMBER }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
