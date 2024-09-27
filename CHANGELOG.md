@@ -1,3 +1,10 @@
+## [2.5.5](https://github.com/GustavoNobuntu/automatiza-o-de-vers-o/compare/v2.5.4...v2.5.5) (2024-09-27)
+
+
+### Bug Fixes
+
+* **pencil:** corrigindo o workflow ([e73345f](https://github.com/GustavoNobuntu/automatiza-o-de-vers-o/commit/e73345f275ddcfa94ee51dd6e334396837cd760b))
+
 ## [2.5.4](https://github.com/GustavoNobuntu/automatiza-o-de-vers-o/compare/v2.5.3...v2.5.4) (2024-09-27)
 
 
