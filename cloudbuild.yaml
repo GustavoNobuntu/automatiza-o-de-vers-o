@@ -6,4 +6,4 @@ steps:
     args: ['push', 'gcr.io/ninth-glider-366922/testerepositorio']
 
   - name: 'gcr.io/cloud-builders/gcloud'
-    args: ['run', 'deploy', 'testerepositorio3', '--image', 'gcr.io/ninth-glider-366922/testerepositorio', '--region', 'southamerica-east1']
+    args: ['run', 'deploy', 'testerepositorio3', '--image', 'gcr.io/ninth-glider-366922/testerepositorio', '--region', 'southamerica-east1', '--port', '8081']
